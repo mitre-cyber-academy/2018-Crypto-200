@@ -14,14 +14,15 @@ import math
 
 from PIL import Image
 
-def get_potential_hashes(data, idx):
+def get_potential_hashes(data):
     potential_hashes = defaultdict(list)
     for c in data:
-        for salt in range(0, 2**16):
-            salt = str(salt)
-            pepper = str(idx)
-            hash = hashlib.md5(salt + c.encode('utf') + pepper).hexdigest()
-            potential_hashes[hash].append(c)
+        for idx in range(20):
+            for salt in range(0, 2**16):
+                salt = str(salt)
+                pepper = str(idx)
+                hash = hashlib.md5(salt + c.encode('utf') + pepper).hexdigest()
+                potential_hashes[hash].append(c)
     return potential_hashes
 
 def horiz_slice(image_path, slice_size):
@@ -57,10 +58,9 @@ def img_to_hash(img):
 
 if __name__ == '__main__':
     possible_letters = 'MCA-0123456789abcdef'
+    potential_hashes = get_potential_hashes(possible_letters)
 
-    for idx in range(20):
-        potential_hashes = get_potential_hashes(possible_letters, idx)
-        for img in horiz_slice('code.png', 32):
-            hash = img_to_hash(img)
-            if hash in potential_hashes:
-                print('we good', potential_hashes[hash])
+    for img in horiz_slice('code.png', 32):
+        hash = img_to_hash(img)
+        if hash in potential_hashes:
+            print('we good', potential_hashes[hash])
